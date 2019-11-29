@@ -21,24 +21,22 @@ export default class App extends Component {
   };
 
   componentDidMount() {
-    window.addEventListener('keydown', this.handelPress);
     const { query, pageNumber } = this.state;
     this.fetchImages(query, pageNumber);
   }
 
   componentDidUpdate(prevProps, prevState) {
-    const { pageNumber, query } = this.state;
+    const { pageNumber, query, images } = this.state;
     if (prevState.pageNumber !== pageNumber || prevState.query !== query) {
       this.fetchImages(query, pageNumber);
     }
-    window.scrollTo({
-      top: document.documentElement.scrollHeight,
-      behavior: 'smooth',
-    });
-  }
 
-  componentWillUnmount() {
-    window.removeEventListener('keydown', this.handelPress);
+    if (prevState.images !== images && images > 15) {
+      window.scrollTo({
+        top: document.documentElement.scrollHeight,
+        behavior: 'smooth',
+      });
+    }
   }
 
   handelPress = e => {
@@ -64,10 +62,6 @@ export default class App extends Component {
     this.setState(prevState => ({
       pageNumber: prevState.pageNumber + 1,
     }));
-    window.scrollTo({
-      top: document.documentElement.scrollHeight,
-      behavior: 'smooth',
-    });
   };
 
   onSearch = queryParametr => {
@@ -76,9 +70,11 @@ export default class App extends Component {
 
   openModal = imgUrl => {
     this.setState({ isOpenModal: true, img: imgUrl });
+    window.addEventListener('keydown', this.handelPress);
   };
 
   closeModal = e => {
+    window.removeEventListener('keydown', this.handelPress);
     if (e.target === e.currentTarget) {
       this.setState({ isOpenModal: false });
     }
